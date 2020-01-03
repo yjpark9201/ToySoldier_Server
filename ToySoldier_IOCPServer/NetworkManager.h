@@ -1,6 +1,7 @@
 #pragma once
 
 typedef unordered_map< int, GameObjectPtr > IntToGameObjectMap;
+#define CPU_NUM 8
 
 class NetworkManager
 {
@@ -11,11 +12,17 @@ public:
 	static const uint32_t	kInputCC = 'INPT';
 	static const int		kMaxPacketsPerFrameCount = 10;
 
+    static HANDLE			HCP; // 입출력포트 핸들
+	static HANDLE			CreateWorkerThreadEvent;// 워커쓰레드 생성이벤트
+
 	NetworkManager();
 	virtual ~NetworkManager();
 
 	bool	Init(uint16_t inPort);
 	void	ProcessIncomingPackets();
+
+	bool	CreateWorkerThread();
+	bool	CreateListenThread();
 
 	virtual void	ProcessPacket(InputMemoryBitStream& inInputStream, const SocketAddress& inFromAddress) = 0;
 	virtual void	HandleConnectionReset(const SocketAddress& inFromAddress) { (void)inFromAddress; }
@@ -61,7 +68,7 @@ private:
 
 	queue< ReceivedPacket, list< ReceivedPacket > >	mPacketQueue;
 
-	UDPSocketPtr	mSocket;
+	TCPSocketPtr	mSocket;
 
 	WeightedTimedMovingAverage	mBytesReceivedPerSecond;
 	WeightedTimedMovingAverage	mBytesSentPerSecond;
@@ -70,6 +77,11 @@ private:
 
 	float						mDropPacketChance;
 	float						mSimulatedLatency;
+
+
+	HANDLE					mWorkerThreads[CPU_NUM * 2];
+	HANDLE					mListenThread;
+
 
 };
 

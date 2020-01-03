@@ -4,7 +4,7 @@
 #ifdef _WIN32
 
 #pragma warning(disable: 4267)
-
+#pragma warning(disable: 4996)
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 
@@ -95,7 +95,8 @@ class GameObject;
 #include "ReplicationCommand.h"
 
 
-
+#include "WorkerThread.h"
+#include "ListenThread.h"
 #include "NetworkManager.h"
 
 #include "Engine.h"
@@ -106,5 +107,8 @@ class GameObject;
 #include "ClientProxy.h"
 #include "NetworkManagerServer.h"
 #include "Server.h"
+
+
+
 
 

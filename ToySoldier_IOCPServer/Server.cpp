@@ -9,7 +9,6 @@ bool Server::StaticInit()
 {
 	printf("서버 재기동\n");
 	sInstance.reset(new Server());
-	sInstance->PrintCoreNum(); 
 	return true;
 }
 
@@ -33,9 +32,9 @@ Server::Server()
 int Server::Run()
 {
 	//SetupWorld();
-	//return Engine::Run();
+	return Engine::Run();
 
-	return 0;
+	//return 0;
 }
 
 bool Server::InitNetworkManager()

@@ -52,7 +52,6 @@ int Engine::DoRunLoop()
 	bool quit = false;
 	SDL_Event event;
 	memset(&event, 0, sizeof(SDL_Event));
-
 	while (!quit && mShouldKeepRunning)
 	{
 		if (SDL_PollEvent(&event))
@@ -68,9 +67,9 @@ int Engine::DoRunLoop()
 		}
 		else
 		{
-			Timing::sInstance.Update();
+			//Timing::sInstance.Update();
 
-			DoFrame();
+			//DoFrame();
 		}
 	}
 

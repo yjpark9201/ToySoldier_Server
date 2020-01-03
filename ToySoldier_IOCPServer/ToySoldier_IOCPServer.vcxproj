@@ -190,7 +190,9 @@
     <ClCompile Include="Toymath.cpp" />
     <ClCompile Include="ToySoldier_IOCPServer.cpp" />
     <ClCompile Include="UDPSocket.cpp" />
+    <ClCompile Include="WorkerThread.cpp" />
     <ClCompile Include="World.cpp" />
+    <ClCompile Include="ListenThread.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ByteSwap.h" />
@@ -200,6 +202,7 @@
     <ClInclude Include="GameObjectRegistry.h" />
     <ClInclude Include="InputState.h" />
     <ClInclude Include="LinkingContext.h" />
+    <ClInclude Include="ListenThread.h" />
     <ClInclude Include="MemoryBitStream.h" />
     <ClInclude Include="Move.h" />
     <ClInclude Include="MoveList.h" />
@@ -223,6 +226,7 @@
     <ClInclude Include="TransmissionData.h" />
     <ClInclude Include="UDPSocket.h" />
     <ClInclude Include="WeightedTimedMovingAverage.h" />
+    <ClInclude Include="WorkerThread.h" />
     <ClInclude Include="World.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
