@@ -1,0 +1,225 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="소스 파일\GameRogicFrame">
+      <UniqueIdentifier>{1d1cc8fa-5cc9-402d-84cb-44a60016121f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Network">
+      <UniqueIdentifier>{1f1a49a5-e5c2-4ee2-8cc9-037482205fc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Util">
+      <UniqueIdentifier>{16c717a5-b0c5-4bf8-a2ca-28bdafae92b7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\GameRogicFrame">
+      <UniqueIdentifier>{61664ddc-6650-4fbe-9ced-9585450d78c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Network">
+      <UniqueIdentifier>{faed94f1-b0e0-42c0-8ab1-4fd8da7dd43e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Util">
+      <UniqueIdentifier>{6175c696-d87f-461a-8745-938d7e7d96b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Replication">
+      <UniqueIdentifier>{ad83fad6-45fd-4056-b568-f0610658fcf3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\InPut">
+      <UniqueIdentifier>{6afe47a3-f212-4e95-9b3c-45e01e59c187}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Replication">
+      <UniqueIdentifier>{3dec5655-c831-45d1-b7f1-b5ad7689f949}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\GameRogicFrame\GameObject">
+      <UniqueIdentifier>{aa0f0da3-969b-49e8-85dd-dda9bc82aa68}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Main">
+      <UniqueIdentifier>{0fa6aaa2-8c26-4c3d-bb22-9691c5b12f74}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\InPut">
+      <UniqueIdentifier>{3221eb1e-edbf-48a8-b05c-2fbdb562b458}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\GameObject">
+      <UniqueIdentifier>{1f393bca-30a2-4719-9a01-d5c6e6ab21a5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="MemoryBitStream.cpp">
+      <Filter>소스 파일\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientProxy.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkManager.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="NetworkManagerServer.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="PacketMgr.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="SocketAddress.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="SocketUtil.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="TCPSocket.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="UDPSocket.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Timing.cpp">
+      <Filter>소스 파일\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="StringUtils.cpp">
+      <Filter>소스 파일\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Toymath.cpp">
+      <Filter>소스 파일\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Engine.cpp">
+      <Filter>소스 파일\GameRogicFrame</Filter>
+    </ClCompile>
+    <ClCompile Include="ScoreBoardManager.cpp">
+      <Filter>소스 파일\GameRogicFrame</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObject.cpp">
+      <Filter>소스 파일\GameRogicFrame\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="GameObjectRegistry.cpp">
+      <Filter>소스 파일\GameRogicFrame\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="World.cpp">
+      <Filter>소스 파일\GameRogicFrame</Filter>
+    </ClCompile>
+    <ClCompile Include="InputState.cpp">
+      <Filter>소스 파일\InPut</Filter>
+    </ClCompile>
+    <ClCompile Include="Move.cpp">
+      <Filter>소스 파일\InPut</Filter>
+    </ClCompile>
+    <ClCompile Include="MoveList.cpp">
+      <Filter>소스 파일\InPut</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicationManagerServer.cpp">
+      <Filter>소스 파일\Replication</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplicationManagerTransmissionData.cpp">
+      <Filter>소스 파일\Replication</Filter>
+    </ClCompile>
+    <ClCompile Include="Server.cpp">
+      <Filter>소스 파일\GameRogicFrame</Filter>
+    </ClCompile>
+    <ClCompile Include="ToySoldier_IOCPServer.cpp">
+      <Filter>소스 파일\Main</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MemoryBitStream.h">
+      <Filter>헤더 파일\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Timing.h">
+      <Filter>헤더 파일\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="TCPSocket.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="UDPSocket.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientProxy.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="protocol.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="SocketInfo.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="SocketUtil.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="SocketAddress.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkManagerServer.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="NetworkManager.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="PacketMgr.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Toymath.h">
+      <Filter>헤더 파일\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="StringUtils.h">
+      <Filter>헤더 파일\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Toy_Shared.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationCommand.h">
+      <Filter>헤더 파일\Replication</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationManagerServer.h">
+      <Filter>헤더 파일\Replication</Filter>
+    </ClInclude>
+    <ClInclude Include="ReplicationManagerTransmissionData.h">
+      <Filter>헤더 파일\Replication</Filter>
+    </ClInclude>
+    <ClInclude Include="Engine.h">
+      <Filter>헤더 파일\GameRogicFrame</Filter>
+    </ClInclude>
+    <ClInclude Include="ScoreBoardManager.h">
+      <Filter>헤더 파일\GameRogicFrame</Filter>
+    </ClInclude>
+    <ClInclude Include="World.h">
+      <Filter>헤더 파일\GameRogicFrame</Filter>
+    </ClInclude>
+    <ClInclude Include="ByteSwap.h">
+      <Filter>헤더 파일\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="WeightedTimedMovingAverage.h">
+      <Filter>헤더 파일\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObject.h">
+      <Filter>헤더 파일\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="GameObjectRegistry.h">
+      <Filter>헤더 파일\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="LinkingContext.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="Move.h">
+      <Filter>헤더 파일\InPut</Filter>
+    </ClInclude>
+    <ClInclude Include="MoveList.h">
+      <Filter>헤더 파일\InPut</Filter>
+    </ClInclude>
+    <ClInclude Include="InputState.h">
+      <Filter>헤더 파일\InPut</Filter>
+    </ClInclude>
+    <ClInclude Include="Server.h">
+      <Filter>헤더 파일\GameRogicFrame</Filter>
+    </ClInclude>
+    <ClInclude Include="TransmissionData.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
