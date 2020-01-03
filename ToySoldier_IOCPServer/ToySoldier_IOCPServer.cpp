@@ -10,7 +10,7 @@
 DWORD WINAPI WorkerThread(LPVOID arg);
 HANDLE CreateThreadEvent;
 
-int main(int argc, char *argv[])
+int main(int argc, char *args[])
 {
 
 	//if (Server::StaticInit())
@@ -104,7 +104,7 @@ DWORD WINAPI WorkerThread(LPVOID arg)
 		TCPSocketPtr client_sock;
 
 		retval = GetQueuedCompletionStatus(hcp, &cbTransferred,
-			(LPDWORD)&client_sock, (LPOVERLAPPED *)&ptr, INFINITE);
+			(PULONG_PTR)&client_sock, (LPOVERLAPPED *)&ptr, INFINITE);
 		//printf(" 소켓 정보 구조체 주소 : %d", ptr);
 
 

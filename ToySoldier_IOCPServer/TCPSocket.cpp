@@ -64,7 +64,7 @@ int32_t TCPSocket::GetStatusIOCP(HANDLE hcp, SOCKETINFO& ptr, DWORD& cbTransferr
 	//SOCKETINFO *ptr = nullptr;
 
 	int retval = GetQueuedCompletionStatus(hcp, &cbTransferred,
-		(LPDWORD)&client_sock, (LPOVERLAPPED *)&ptr, INFINITE);
+		(PULONG_PTR)&client_sock, (LPOVERLAPPED *)&ptr, INFINITE);
 
 
 	if (retval < 0)

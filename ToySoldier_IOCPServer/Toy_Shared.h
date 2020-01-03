@@ -1,8 +1,13 @@
 #pragma once
 
+
 #ifdef _WIN32
+
+#pragma warning(disable: 4267)
+
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
+
 
 #include "Windows.h"
 #include "WinSock2.h"
