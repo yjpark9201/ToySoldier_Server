@@ -168,7 +168,7 @@ struct GetRequiredBits
 	enum { Value = GetRequiredBitsHelper< tValue, 0 >::Value };
 };
 
-namespace RoboMath
+namespace ToyMath
 {
 	const float PI = 3.1415926535f;
 	float GetRandomFloat();

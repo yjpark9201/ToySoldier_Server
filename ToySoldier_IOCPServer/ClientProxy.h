@@ -5,11 +5,13 @@ class ClientProxy
 {
 public:
 
-	ClientProxy(const SocketAddress& inSocketAddress, const string& inName, int inPlayerId);
+	ClientProxy(const TCPSocketPtr InSock ,const SocketAddress& inSocketAddress, const string& inName, int inPlayerId);
 
 	const	SocketAddress&	GetSocketAddress()	const { return mSocketAddress; }
 	int				GetPlayerId()		const { return mPlayerId; }
 	const	string&		GetName()			const { return mName; }
+	void				SetName(const string & name) {  mName = name; }
+	const	TCPSocketPtr&	GetTCPSocket() { return mSock; }
 
 	void			SetInputState(const InputState& inInputState) { mInputState = inInputState; }
 	const	InputState&		GetInputState()		const { return mInputState; }
@@ -46,9 +48,8 @@ private:
 
 	MoveList		mUnprocessedMoveList;
 	bool			mIsLastMoveTimestampDirty;
-
+	TCPSocketPtr	mSock;
 
 
 };
 
-typedef shared_ptr< ClientProxy >	ClientProxyPtr;

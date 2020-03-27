@@ -1,15 +1,12 @@
 #pragma once
 
 typedef unordered_map< int, GameObjectPtr > IntToGameObjectMap;
-#define CPU_NUM 8
+
 
 class NetworkManager
 {
 public:
-	static const uint32_t	kHelloCC = 'HELO';
-	static const uint32_t	kWelcomeCC = 'WLCM';
-	static const uint32_t	kStateCC = 'STAT';
-	static const uint32_t	kInputCC = 'INPT';
+
 	static const int		kMaxPacketsPerFrameCount = 10;
 
     static HANDLE			HCP; // 입출력포트 핸들
@@ -19,15 +16,15 @@ public:
 	virtual ~NetworkManager();
 
 	bool	Init(uint16_t inPort);
-	void	ProcessIncomingPackets();
+	void	ProcessIncomingPackets(SOCKETINFO& ptr, DWORD & cbTransferred);
 
 	bool	CreateWorkerThread();
 	bool	CreateListenThread();
 
-	virtual void	ProcessPacket(InputMemoryBitStream& inInputStream, const SocketAddress& inFromAddress) = 0;
+	virtual void	ProcessPacket(InputMemoryBitStream& inInputStream, SOCKETINFO& ptr, DWORD & cbTransferred, const SocketAddress& inFromAddress) = 0;
 	virtual void	HandleConnectionReset(const SocketAddress& inFromAddress) { (void)inFromAddress; }
 
-	void	SendPacket(const OutputMemoryBitStream& inOutputStream, const SocketAddress& inFromAddress);
+	void	SentByteCount(int sentbyte);
 
 	const WeightedTimedMovingAverage& GetBytesReceivedPerSecond()	const { return mBytesReceivedPerSecond; }
 	const WeightedTimedMovingAverage& GetBytesSentPerSecond()		const { return mBytesSentPerSecond; }
@@ -39,36 +36,21 @@ public:
 	void	AddToNetworkIdToGameObjectMap(GameObjectPtr inGameObject);
 	void	RemoveFromNetworkIdToGameObjectMap(GameObjectPtr inGameObject);
 
+	void	ReadIncomingPackets(SOCKETINFO& ptr, DWORD &retval, DWORD &transferred, int &thread_id);
+
 protected:
 
 	IntToGameObjectMap		mNetworkIdToGameObjectMap;
+	PacketMgr		mPacketMgr;
 
 private:
 
-	class ReceivedPacket
-	{
-	public:
-		ReceivedPacket(float inReceivedTime, InputMemoryBitStream& inInputMemoryBitStream, const SocketAddress& inAddress);
-
-		const	SocketAddress&			GetFromAddress()	const { return mFromAddress; }
-		float					GetReceivedTime()	const { return mReceivedTime; }
-		InputMemoryBitStream&	GetPacketBuffer() { return mPacketBuffer; }
-
-	private:
-
-		float					mReceivedTime;
-		InputMemoryBitStream	mPacketBuffer;
-		SocketAddress			mFromAddress;
-
-	};
 
 	void	UpdateBytesSentLastFrame();
-	void	ReadIncomingPacketsIntoQueue();
-	void	ProcessQueuedPackets();
 
-	queue< ReceivedPacket, list< ReceivedPacket > >	mPacketQueue;
+	void	ProcessQueuedPackets(SOCKETINFO& ptr, DWORD & cbTransferred);
 
-	TCPSocketPtr	mSocket;
+
 
 	WeightedTimedMovingAverage	mBytesReceivedPerSecond;
 	WeightedTimedMovingAverage	mBytesSentPerSecond;
@@ -81,6 +63,8 @@ private:
 
 	HANDLE					mWorkerThreads[CPU_NUM * 2];
 	HANDLE					mListenThread;
+
+
 
 
 };

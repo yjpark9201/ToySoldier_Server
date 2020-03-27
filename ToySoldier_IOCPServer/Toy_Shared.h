@@ -54,8 +54,9 @@ using std::unordered_set;
 
 class RoboCat;
 class GameObject;
+#include"define.h"
 #include "Toymath.h"
-//
+#include "circular_buffer.h"
 #include "StringUtils.h"
 #include "SocketAddress.h"
 //#include "SocketAddressFactory.h"
@@ -68,7 +69,7 @@ class GameObject;
 #include "ByteSwap.h"
 #include "LinkingContext.h"
 #include "MemoryBitStream.h"
-#include "PacketMgr.h"
+
 
 
 #include "TransmissionData.h"
@@ -93,7 +94,7 @@ class GameObject;
 //
 #include "WeightedTimedMovingAverage.h"
 #include "ReplicationCommand.h"
-
+#include "PacketMgr.h"
 
 #include "WorkerThread.h"
 #include "ListenThread.h"
@@ -102,9 +103,11 @@ class GameObject;
 #include "Engine.h"
 
 //서버전용
+
 #include "ReplicationManagerTransmissionData.h"
 #include "ReplicationManagerServer.h"
 #include "ClientProxy.h"
+#include "ClientMgr.h"
 #include "NetworkManagerServer.h"
 #include "Server.h"
 

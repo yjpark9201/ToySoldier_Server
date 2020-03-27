@@ -59,7 +59,7 @@ namespace
 		for (int i = 0; i < inMouseCount; ++i)
 		{
 			go = GameObjectRegistry::sInstance->CreateGameObject('MOUS');
-			Vector3 mouseLocation = RoboMath::GetRandomVector(mouseMin, mouseMax);
+			Vector3 mouseLocation = ToyMath::GetRandomVector(mouseMin, mouseMax);
 			go->SetLocation(mouseLocation);
 		}
 	}
@@ -79,9 +79,9 @@ void Server::SetupWorld()
 
 void Server::DoFrame()
 {
-	NetworkManagerServer::sInstance->ProcessIncomingPackets();
+	//NetworkManagerServer::sInstance->ProcessIncomingPackets();
 
-	NetworkManagerServer::sInstance->CheckForDisconnects();
+	//NetworkManagerServer::sInstance->CheckForDisconnects();
 
 	NetworkManagerServer::sInstance->RespawnCats();
 
@@ -123,6 +123,8 @@ void Server::HandleLostClient(ClientProxyPtr inClientProxy)
 	//	cat->SetDoesWantToDie(true);
 	//}
 }
+
+
 
 //RoboCatPtr Server::GetCatForPlayer(int inPlayerId)
 //{

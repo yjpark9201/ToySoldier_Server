@@ -1,7 +1,6 @@
 #include "Toy_Shared.h"
 
 
-
 int TCPSocket::Connect(const SocketAddress& inAddress)
 {
 	int err = connect(mSocket, &inAddress.mSockAddr, inAddress.GetSize());
@@ -24,61 +23,23 @@ int TCPSocket::Listen(int inBackLog)
 	return NO_ERROR;
 }
 
-void TCPSocket::ConnectIOCP(HANDLE hcp) {
-	CreateIoCompletionPort((HANDLE)mSocket, hcp, (ULONG_PTR)this, 0);
+void TCPSocket::ConnectIOCP(HANDLE hcp, TCPSocketPtr clientsock) {
+	CreateIoCompletionPort((HANDLE)mSocket, hcp, 0, 0);
 
-}
-SOCKETINFO*	TCPSocket::MakeSocketInfo() {
-	return 	new SOCKETINFO(mSocket);
-
-}
-
-int32_t TCPSocket::IOCPRecv(SOCKETINFO& ptr, DWORD& flags, DWORD& recvbytes)
-{
-	// 소켓과 입출력 완료 포트 연결
-
-	int retval = 0;
-	retval = WSARecv(mSocket, &(ptr.wsabuf), 1, &recvbytes, //이부분 없으면 작업자 스레드들이 깨어나지 않아서 데이터 자체를 못받음. 
-		&flags, &ptr.overlapped, NULL);
-
-	if (retval < 0)
-	{
-
-		if (WSAGetLastError() != ERROR_IO_PENDING) {
-			SocketUtil::ReportError("WSARecv()");
-			return -SocketUtil::GetLastError();
-		}
-	
-	}
-	return retval;
+	// 첫번째 인자 IOCP와 연결할 device의 핸들, File IO라면 Fileobject, 네트워크니까 Socket.
+	// TCPSOcketPtr 던져주면 연결 못해줌.
+	// 두번째 인자 Handle은 이미 만들어진 Completion 객체에 대한 핸들
+	// 세번째 인자는 완료된 
 }
 
-int32_t TCPSocket::GetStatusIOCP(HANDLE hcp, SOCKETINFO& ptr, DWORD& cbTransferred)
-{
-	/*int retval = GetQueuedCompletionStatus(hcp, &cbTransferred,
-		(LPDWORD)&mSocket, (LPOVERLAPPED *)&ptr, INFINITE);*/
+void	TCPSocket::WSAGetOverlapptedResult(LPWSAOVERLAPPED lpoverlapped) {
+	DWORD temp1, temp2;
+	WSAGetOverlappedResult(mSocket, lpoverlapped,
+		&temp1, FALSE, &temp2);
+	err_display("WSAGetOverlappedResult()");
 
-
-	//DWORD cbTransferred;
-	SOCKET client_sock;
-	//SOCKETINFO *ptr = nullptr;
-
-	int retval = GetQueuedCompletionStatus(hcp, &cbTransferred,
-		(PULONG_PTR)&client_sock, (LPOVERLAPPED *)&ptr, INFINITE);
-
-
-	if (retval < 0)
-	{
-
-		if (WSAGetLastError() != ERROR_IO_PENDING) {
-			SocketUtil::ReportError("WSARecv()");
-			return -SocketUtil::GetLastError();
-		}
-
-	}
-
-	return retval;
 }
+
 
 TCPSocketPtr TCPSocket::Accept(SocketAddress& inFromAddress)
 {
@@ -118,6 +79,57 @@ int32_t	TCPSocket::Receive(void* inData, size_t inLen)
 	return bytesReceivedCount;
 }
 
+int32_t TCPSocket::IOCPRecv(SOCKETINFO& ptr, DWORD& flags)
+{
+	// 소켓과 입출력 완료 포트 연결
+
+	int retval = 0;
+	DWORD recvbytes = 0;
+
+	ZeroMemory(&ptr.overlapped, sizeof(ptr.overlapped));
+	ptr.wsabuf.buf = ptr.ringbuffer->GetRecordablePoint();
+	ptr.wsabuf.len = ptr.ringbuffer->GetRecordableSize();
+
+	retval = WSARecv(mSocket, &(ptr.wsabuf), 1, &recvbytes, &flags, &ptr.overlapped, NULL);
+
+	if (retval < 0)
+	{
+
+		if (WSAGetLastError() != ERROR_IO_PENDING) {
+			SocketUtil::ReportError("WSARecv()");
+			return -SocketUtil::GetLastError();
+		}
+
+	}
+	return retval;
+}
+
+int32_t TCPSocket::IOCPSend(SOCKETINFO& ptr)
+{
+	// 소켓과 입출력 완료 포트 연결
+
+	int retval = 0;
+	DWORD sendbytes;
+
+	ZeroMemory(&ptr.overlapped, sizeof(ptr.overlapped));
+	//ptr.wsabuf.buf = ptr.ringbuffer->GetRecordablePoint();
+	//ptr.wsabuf.len = ptr.ringbuffer->GetRecordableSize();
+
+	retval = WSASend(mSocket, &(ptr.wsabuf), 1,&sendbytes, 0, &(ptr.overlapped), NULL);
+	if (retval < 0)
+	{
+
+		if (WSAGetLastError() != ERROR_IO_PENDING) {
+			SocketUtil::ReportError("WSARecv()");
+			return -SocketUtil::GetLastError();
+		}
+
+	}
+	return retval;
+
+}
+
+
 int TCPSocket::Bind(const SocketAddress& inBindAddress)
 {
 	int error = bind(mSocket, &inBindAddress.mSockAddr, inBindAddress.GetSize());
@@ -156,7 +168,6 @@ int TCPSocket::SetNonBlockingMode(bool inShouldBeNonBlocking)
 TCPSocket::~TCPSocket()
 {
 #if _WIN32
-	printf("TCP소켓종료");
 	closesocket(mSocket);
 #else
 	close(mSocket);

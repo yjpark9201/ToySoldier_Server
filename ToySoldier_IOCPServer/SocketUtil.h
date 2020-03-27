@@ -24,6 +24,8 @@ struct TCP_Theadinfo {
 
 	TCP_Theadinfo(int th_id, HANDLE th_hcp) { id = th_id, hcp = th_hcp; }
 };
+
+
 class SocketUtil
 {
 public:

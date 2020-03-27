@@ -8,21 +8,21 @@ class TCPSocket
 public:
 	~TCPSocket();
 	int								Connect(const SocketAddress& inAddress);
-	void                            ConnectIOCP(HANDLE hcp);
+	void                            ConnectIOCP(HANDLE hcp, TCPSocketPtr clientsock);
 	int								Bind(const SocketAddress& inToAddress);
 	int								Listen(int inBackLog = 32);
 	shared_ptr< TCPSocket >			Accept(SocketAddress& inFromAddress);
 	int32_t							Send(const void* inData, size_t inLen);
 	int32_t							Receive(void* inBuffer, size_t inLen);
-	int32_t							IOCPRecv(SOCKETINFO& ptr, DWORD& flags, DWORD& recvbytes);
+	int32_t							IOCPRecv(SOCKETINFO& ptr, DWORD& flags);
+	int32_t							IOCPSend(SOCKETINFO& ptr);
 	int                             SetNonBlockingMode(bool inShouldBeNonBlocking);
-	SOCKETINFO*						MakeSocketInfo();
-	int32_t							GetStatusIOCP(HANDLE hcp, SOCKETINFO& ptr, DWORD& cbTransferred);
+	void							WSAGetOverlapptedResult(LPWSAOVERLAPPED lpoverlapped);
 private:
 	friend class SocketUtil;
-	friend class SOCKETINFO;
+	friend struct SOCKETINFO;
 
 	TCPSocket(SOCKET inSocket) : mSocket(inSocket) {}
 	SOCKET		mSocket;
 };
-typedef shared_ptr< TCPSocket > TCPSocketPtr;
+

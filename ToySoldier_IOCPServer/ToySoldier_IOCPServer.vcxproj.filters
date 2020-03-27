@@ -52,13 +52,16 @@
     <Filter Include="헤더 파일\GameObject">
       <UniqueIdentifier>{1f393bca-30a2-4719-9a01-d5c6e6ab21a5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Network\ClientMgr">
+      <UniqueIdentifier>{8ae81717-dd9a-487c-a1cc-55965ff2104d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\ClientMgr">
+      <UniqueIdentifier>{e1737765-c9df-4c22-aca7-512051d61e6e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="MemoryBitStream.cpp">
       <Filter>소스 파일\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="ClientProxy.cpp">
-      <Filter>소스 파일\Network</Filter>
     </ClCompile>
     <ClCompile Include="NetworkManager.cpp">
       <Filter>소스 파일\Network</Filter>
@@ -132,6 +135,15 @@
     <ClCompile Include="WorkerThread.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="circular_buffer.cpp">
+      <Filter>소스 파일\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientProxy.cpp">
+      <Filter>소스 파일\Network\ClientMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="ClientMgr.cpp">
+      <Filter>소스 파일\Network\ClientMgr</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MemoryBitStream.h">
@@ -144,9 +156,6 @@
       <Filter>헤더 파일\Network</Filter>
     </ClInclude>
     <ClInclude Include="UDPSocket.h">
-      <Filter>헤더 파일\Network</Filter>
-    </ClInclude>
-    <ClInclude Include="ClientProxy.h">
       <Filter>헤더 파일\Network</Filter>
     </ClInclude>
     <ClInclude Include="protocol.h">
@@ -232,6 +241,18 @@
     </ClInclude>
     <ClInclude Include="ListenThread.h">
       <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="circular_buffer.h">
+      <Filter>헤더 파일\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="define.h">
+      <Filter>헤더 파일\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientProxy.h">
+      <Filter>헤더 파일\ClientMgr</Filter>
+    </ClInclude>
+    <ClInclude Include="ClientMgr.h">
+      <Filter>헤더 파일\ClientMgr</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

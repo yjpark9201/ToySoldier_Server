@@ -15,7 +15,7 @@ const Vector3 Vector3::UnitX(1.0f, 0.0f, 0.0f);
 const Vector3 Vector3::UnitY(0.0f, 1.0f, 0.0f);
 const Vector3 Vector3::UnitZ(0.0f, 0.0f, 1.0f);
 
-float RoboMath::GetRandomFloat()
+float ToyMath::GetRandomFloat()
 {
 	static std::random_device rd;
 	static std::mt19937 gen(rd());
@@ -23,7 +23,7 @@ float RoboMath::GetRandomFloat()
 	return dis(gen);
 }
 
-Vector3 RoboMath::GetRandomVector(const Vector3& inMin, const Vector3& inMax)
+Vector3 ToyMath::GetRandomVector(const Vector3& inMin, const Vector3& inMax)
 {
 	Vector3 r = Vector3(GetRandomFloat(), GetRandomFloat(), GetRandomFloat());
 	return inMin + (inMax - inMin) * r;

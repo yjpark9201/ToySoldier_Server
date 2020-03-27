@@ -6,11 +6,12 @@ public:
 
 	static bool				StaticInit(uint16_t inPort);
 
-	virtual void			ProcessPacket(InputMemoryBitStream& inInputStream, const SocketAddress& inFromAddress) override;
+	virtual void			ProcessPacket(InputMemoryBitStream& inInputStream, SOCKETINFO& ptr, DWORD & cbTransferred,
+									const SocketAddress& inFromAddress) override;
 	virtual void			HandleConnectionReset(const SocketAddress& inFromAddress) override;
 
 	void			SendOutgoingPackets();
-	void			CheckForDisconnects();
+	bool			CheckForDisconnects(SOCKETINFO& ptr, DWORD &retval, DWORD & cbTransferred);
 
 	void			RegisterGameObject(GameObjectPtr inGameObject);
 	inline	GameObjectPtr	RegisterAndReturn(GameObject* inGameObject);
@@ -19,15 +20,15 @@ public:
 
 	void			RespawnCats();
 
-	ClientProxyPtr	GetClientProxy(int inPlayerId) const;
+	SOCKETINFO*			MakeSocketInfo(TCPSocketPtr clientsock, SocketAddress & clientaddr);
 
 private:
 	NetworkManagerServer();
 
-	void	HandlePacketFromNewClient(InputMemoryBitStream& inInputStream, const SocketAddress& inFromAddress);
-	void	ProcessPacket(ClientProxyPtr inClientProxy, InputMemoryBitStream& inInputStream);
+	void	HandlePacketFromNewClient(SOCKETINFO& info, InputMemoryBitStream& inInputStream, const SocketAddress& inFromAddress);
 
-	void	SendWelcomePacket(ClientProxyPtr inClientProxy);
+
+
 	void	UpdateAllClients();
 
 	void	AddWorldStateToPacket(OutputMemoryBitStream& inOutputStream);
@@ -36,7 +37,7 @@ private:
 	void	SendStatePacketToClient(ClientProxyPtr inClientProxy);
 	void	WriteLastMoveTimestampIfDirty(OutputMemoryBitStream& inOutputStream, ClientProxyPtr inClientProxy);
 
-	void	HandleInputPacket(ClientProxyPtr inClientProxy, InputMemoryBitStream& inInputStream);
+
 
 	void	HandleClientDisconnected(ClientProxyPtr inClientProxy);
 
@@ -54,6 +55,8 @@ private:
 	float			mTimeOfLastSatePacket;
 	float			mTimeBetweenStatePackets;
 	float			mClientDisconnectTimeout;
+
+	
 
 	
 };

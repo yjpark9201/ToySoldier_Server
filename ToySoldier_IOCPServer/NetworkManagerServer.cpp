@@ -14,6 +14,7 @@ NetworkManagerServer::NetworkManagerServer() :
 
 bool NetworkManagerServer::StaticInit(uint16_t inPort)
 {
+	
 	sInstance = new NetworkManagerServer();
 	return sInstance->Init(inPort);
 }
@@ -28,7 +29,8 @@ void NetworkManagerServer::HandleConnectionReset(const SocketAddress& inFromAddr
 	}
 }
 
-void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inInputStream, const SocketAddress& inFromAddress)
+void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inInputStream,
+			SOCKETINFO& ptr, DWORD & cbTransferred, const SocketAddress& inFromAddress)
 {
 	//try to get the client proxy for this address
 	//pass this to the client proxy to process
@@ -36,68 +38,51 @@ void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inInputStream, co
 	if (it == mAddressToClientMap.end())
 	{
 		//didn't find one? it's a new cilent..is the a HELO? if so, create a client proxy...
-		HandlePacketFromNewClient(inInputStream, inFromAddress);
+		HandlePacketFromNewClient(ptr, inInputStream, inFromAddress);
 	}
 	else
 	{
-		ProcessPacket((*it).second, inInputStream);
+		mPacketMgr.ProcessPacket((*it).second, inInputStream);
 	}
 }
 
+SOCKETINFO* NetworkManagerServer::MakeSocketInfo(TCPSocketPtr clientsock, SocketAddress & clientaddr) {
+	
+	ClientProxyPtr client = std::make_shared<ClientProxy>(clientsock, clientaddr, "", mNewNetworkId++);
+	return 	new SOCKETINFO(client);
+	
+	//공유변수 mNewNetworkId에 write를 하는 스레드는 listen스레드 뿐이며, write를 하는도중 타 스레드가
+	// read를 해도 서버동작에는 아무 문제 없기에 criticalsection에 대한 별도처리는 따로 하지 않음.
 
-void NetworkManagerServer::ProcessPacket(ClientProxyPtr inClientProxy, InputMemoryBitStream& inInputStream)
-{
-	//remember we got a packet so we know not to disconnect for a bit
-	inClientProxy->UpdateLastPacketTime();
-
-	uint32_t	packetType;
-	inInputStream.Read(packetType);
-	switch (packetType)
-	{
-	case kHelloCC:
-		//need to resend welcome. to be extra safe we should check the name is the one we expect from this address,
-		//otherwise something weird is going on...
-		SendWelcomePacket(inClientProxy);
-		break;
-	case kInputCC:
-		//if (inClientProxy->GetDeliveryNotificationManager().ReadAndProcessState(inInputStream))
-		//{
-			HandleInputPacket(inClientProxy, inInputStream);
-	//	}
-		break;
-	default:
-		LOG("Unknown packet type received from %s", inClientProxy->GetSocketAddress().ToString().c_str());
-		break;
-	}
 }
 
 
-void NetworkManagerServer::HandlePacketFromNewClient(InputMemoryBitStream& inInputStream, const SocketAddress& inFromAddress)
+
+
+void NetworkManagerServer::HandlePacketFromNewClient(SOCKETINFO& info, InputMemoryBitStream& inInputStream, const SocketAddress& inFromAddress)
 {
 	//read the beginning- is it a hello?
 	uint32_t	packetType;
 	inInputStream.Read(packetType);
-	if (packetType == kHelloCC)
+	if (packetType == PacketMgr::kHelloCC)
 	{
 		//read the name
 		string name;
 		inInputStream.Read(name);
-		ClientProxyPtr newClientProxy = std::make_shared< ClientProxy >(inFromAddress, name, mNewPlayerId++);
-		mAddressToClientMap[inFromAddress] = newClientProxy;
-		mPlayerIdToClientMap[newClientProxy->GetPlayerId()] = newClientProxy;
+		Client_Mgr->AddClient(name, info, inFromAddress);
 
 		//tell the server about this client, spawn a cat, etc...
 		//if we had a generic message system, this would be a good use for it...
 		//instead we'll just tell the server directly
-		static_cast<Server*> (Engine::sInstance.get())->HandleNewClient(newClientProxy);
+		static_cast<Server*> (Engine::sInstance.get())->HandleNewClient(info.client);
 
 		//and welcome the client...
-		SendWelcomePacket(newClientProxy);
+		mPacketMgr.SendWelcomePacket(info.client);
 
 		//and now init the replication manager with everything we know about!
 		for (const auto& pair : mNetworkIdToGameObjectMap)
 		{
-			newClientProxy->GetReplicationManagerServer().ReplicateCreate(pair.first, pair.second->GetAllStateMask());
+			info.client->GetReplicationManagerServer().ReplicateCreate(pair.first, pair.second->GetAllStateMask());
 		}
 	}
 	else
@@ -107,17 +92,6 @@ void NetworkManagerServer::HandlePacketFromNewClient(InputMemoryBitStream& inInp
 	}
 }
 
-void NetworkManagerServer::SendWelcomePacket(ClientProxyPtr inClientProxy)
-{
-	OutputMemoryBitStream welcomePacket;
-
-	welcomePacket.Write(kWelcomeCC);
-	welcomePacket.Write(inClientProxy->GetPlayerId());
-
-	LOG("Server Welcoming, new client '%s' as player %d", inClientProxy->GetName().c_str(), inClientProxy->GetPlayerId());
-
-	SendPacket(welcomePacket, inClientProxy->GetSocketAddress());
-}
 
 void NetworkManagerServer::RespawnCats()
 {
@@ -164,7 +138,7 @@ void NetworkManagerServer::SendStatePacketToClient(ClientProxyPtr inClientProxy)
 	OutputMemoryBitStream	statePacket;
 
 	//it's state!
-	statePacket.Write(kStateCC);
+	statePacket.Write(PacketMgr::kStateCC);
 
 	//InFlightPacket* ifp = inClientProxy->GetDeliveryNotificationManager().WriteState(statePacket);
 
@@ -176,9 +150,10 @@ void NetworkManagerServer::SendStatePacketToClient(ClientProxyPtr inClientProxy)
 	inClientProxy->GetReplicationManagerServer().Write(statePacket, rmtd);
 	//ifp->SetTransmissionData('RPLM', TransmissionDataPtr(rmtd));
 
-	SendPacket(statePacket, inClientProxy->GetSocketAddress());
+	mPacketMgr.SendPacketCP(statePacket, inClientProxy,nullptr);
 
 }
+
 
 void NetworkManagerServer::WriteLastMoveTimestampIfDirty(OutputMemoryBitStream& inOutputStream, ClientProxyPtr inClientProxy)
 {
@@ -226,53 +201,24 @@ int NetworkManagerServer::GetNewNetworkId()
 
 }
 
-void NetworkManagerServer::HandleInputPacket(ClientProxyPtr inClientProxy, InputMemoryBitStream& inInputStream)
-{
-	uint32_t moveCount = 0;
-	Move move;
-	inInputStream.Read(moveCount, 2);
 
-	for (; moveCount > 0; --moveCount)
-	{
-		if (move.Read(inInputStream))
-		{
-			if (inClientProxy->GetUnprocessedMoveList().AddMoveIfNew(move))
-			{
-				inClientProxy->SetIsLastMoveTimestampDirty(true);
-			}
+
+
+
+bool NetworkManagerServer::CheckForDisconnects(SOCKETINFO& ptr, DWORD &retval, DWORD & cbTransferred)
+{
+
+	if (retval == 0 || cbTransferred == 0) {
+		if (retval == 0) {
+			ptr.client->GetTCPSocket()->WSAGetOverlapptedResult(&ptr.overlapped);
 		}
-	}
-}
-
-ClientProxyPtr NetworkManagerServer::GetClientProxy(int inPlayerId) const
-{
-	auto it = mPlayerIdToClientMap.find(inPlayerId);
-	if (it != mPlayerIdToClientMap.end())
-	{
-		return it->second;
+		HandleClientDisconnected(ptr.client);
+		delete &ptr;
+		return true;
 	}
 
-	return nullptr;
-}
+	return false;
 
-void NetworkManagerServer::CheckForDisconnects()
-{
-	vector< ClientProxyPtr > clientsToDC;
-
-	float minAllowedLastPacketFromClientTime = Timing::sInstance.GetTimef() - mClientDisconnectTimeout;
-	for (const auto& pair : mAddressToClientMap)
-	{
-		if (pair.second->GetLastPacketFromClientTime() < minAllowedLastPacketFromClientTime)
-		{
-			//can't remove from map while in iterator, so just remember for later...
-			clientsToDC.push_back(pair.second);
-		}
-	}
-
-	for (ClientProxyPtr client : clientsToDC)
-	{
-		HandleClientDisconnected(client);
-	}
 }
 
 void NetworkManagerServer::HandleClientDisconnected(ClientProxyPtr inClientProxy)
@@ -286,6 +232,9 @@ void NetworkManagerServer::HandleClientDisconnected(ClientProxyPtr inClientProxy
 	{
 		Engine::sInstance->SetShouldKeepRunning(false);
 	}
+
+	printf("[TCP 서버] 클라이언트 종료: %s \n",
+		inClientProxy->GetSocketAddress().ToString().c_str());
 }
 
 void NetworkManagerServer::RegisterGameObject(GameObjectPtr inGameObject)

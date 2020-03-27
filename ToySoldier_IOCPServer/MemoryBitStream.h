@@ -36,6 +36,8 @@ public:
 	const 	char*	GetBufferPtr()		const { return mBuffer; }
 	uint32_t		GetBitLength()		const { return mBitHead; }
 	uint32_t		GetByteLength()		const { return (mBitHead + 7) >> 3; }
+	void			UpdateStreamHeader() { short len = (short)GetByteLength(); memmove(mBuffer, (void*)&len, 2); }
+
 
 	void WriteBytes(const void* inData, uint32_t inByteCount) { WriteBits(inData, inByteCount << 3); }
 
