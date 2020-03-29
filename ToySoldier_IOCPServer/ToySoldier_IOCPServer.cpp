@@ -28,5 +28,5 @@ int main(int argc, char *args[])
 
 
 	printf("서버 종료\n");
-	return 0;
+	return 100;
 }

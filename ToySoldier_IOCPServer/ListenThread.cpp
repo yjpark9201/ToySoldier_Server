@@ -39,7 +39,7 @@ DWORD WINAPI ListenThread(LPVOID id) {
 		client_sock->ConnectIOCP(NetworkManager::HCP, client_sock);
 
 		// 소켓 정보 구조체 할당 및 새로운 클라이언트 포록시 생성
-		SOCKETINFO * ptr = NetworkManagerServer::sInstance->MakeSocketInfo(client_sock, clientadrr);
+		SOCKETINFO * ptr = Client_Mgr->MakeClientSockInfo(client_sock, clientadrr);
 
 		// 비동기 입출력 시작 
 		client_sock->IOCPRecv(*ptr, flags);

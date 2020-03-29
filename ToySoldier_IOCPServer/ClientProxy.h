@@ -9,6 +9,7 @@ public:
 
 	const	SocketAddress&	GetSocketAddress()	const { return mSocketAddress; }
 	int				GetPlayerId()		const { return mPlayerId; }
+	void				SetPlayerId(const int & id) { mPlayerId = id; }
 	const	string&		GetName()			const { return mName; }
 	void				SetName(const string & name) {  mName = name; }
 	const	TCPSocketPtr&	GetTCPSocket() { return mSock; }

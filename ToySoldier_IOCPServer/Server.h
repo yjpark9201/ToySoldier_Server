@@ -13,7 +13,7 @@ public:
 	void HandleLostClient(ClientProxyPtr inClientProxy);
 
 	//RoboCatPtr	GetCatForPlayer(int inPlayerId);
-	void	SpawnCatForPlayer(int inPlayerId);
+	void	SpawnUnitForPlayer(int inPlayerId);
 
 
 private:

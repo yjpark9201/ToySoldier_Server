@@ -5,7 +5,6 @@ NetworkManagerServer*	NetworkManagerServer::sInstance;
 
 
 NetworkManagerServer::NetworkManagerServer() :
-	mNewPlayerId(1),
 	mNewNetworkId(1),
 	mTimeBetweenStatePackets(0.033f),
 	mClientDisconnectTimeout(3.f)
@@ -22,10 +21,10 @@ bool NetworkManagerServer::StaticInit(uint16_t inPort)
 void NetworkManagerServer::HandleConnectionReset(const SocketAddress& inFromAddress)
 {
 	//just dc the client right away...
-	auto it = mAddressToClientMap.find(inFromAddress);
-	if (it != mAddressToClientMap.end())
+	ClientProxyPtr client = Client_Mgr->FindClientFromAddress(inFromAddress);
+	if (client == nullptr)
 	{
-		HandleClientDisconnected(it->second);
+		HandleClientDisconnected(client);
 	}
 }
 
@@ -34,27 +33,20 @@ void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inInputStream,
 {
 	//try to get the client proxy for this address
 	//pass this to the client proxy to process
-	auto it = mAddressToClientMap.find(inFromAddress);
-	if (it == mAddressToClientMap.end())
+	ClientProxyPtr client = Client_Mgr->FindClientFromAddress(inFromAddress);
+
+	if (client == nullptr)
 	{
 		//didn't find one? it's a new cilent..is the a HELO? if so, create a client proxy...
 		HandlePacketFromNewClient(ptr, inInputStream, inFromAddress);
 	}
 	else
 	{
-		mPacketMgr.ProcessPacket((*it).second, inInputStream);
+		mPacketMgr.ProcessPacket(client, inInputStream);
 	}
 }
 
-SOCKETINFO* NetworkManagerServer::MakeSocketInfo(TCPSocketPtr clientsock, SocketAddress & clientaddr) {
-	
-	ClientProxyPtr client = std::make_shared<ClientProxy>(clientsock, clientaddr, "", mNewNetworkId++);
-	return 	new SOCKETINFO(client);
-	
-	//공유변수 mNewNetworkId에 write를 하는 스레드는 listen스레드 뿐이며, write를 하는도중 타 스레드가
-	// read를 해도 서버동작에는 아무 문제 없기에 criticalsection에 대한 별도처리는 따로 하지 않음.
 
-}
 
 
 
@@ -69,6 +61,7 @@ void NetworkManagerServer::HandlePacketFromNewClient(SOCKETINFO& info, InputMemo
 		//read the name
 		string name;
 		inInputStream.Read(name);
+
 		Client_Mgr->AddClient(name, info, inFromAddress);
 
 		//tell the server about this client, spawn a cat, etc...
@@ -95,12 +88,12 @@ void NetworkManagerServer::HandlePacketFromNewClient(SOCKETINFO& info, InputMemo
 
 void NetworkManagerServer::RespawnCats()
 {
-	for (auto it = mAddressToClientMap.begin(), end = mAddressToClientMap.end(); it != end; ++it)
+	/*for (auto it = mAddressToClientMap.begin(), end = mAddressToClientMap.end(); it != end; ++it)
 	{
 		ClientProxyPtr clientProxy = it->second;
 
 		clientProxy->RespawnCatIfNecessary();
-	}
+	}*/
 }
 
 void NetworkManagerServer::SendOutgoingPackets()
@@ -108,28 +101,28 @@ void NetworkManagerServer::SendOutgoingPackets()
 	float time = Timing::sInstance.GetTimef();
 
 	//let's send a client a state packet whenever their move has come in...
-	for (auto it = mAddressToClientMap.begin(), end = mAddressToClientMap.end(); it != end; ++it)
-	{
-		ClientProxyPtr clientProxy = it->second;
-		//process any timed out packets while we're going through the list
-		//clientProxy->GetDeliveryNotificationManager().ProcessTimedOutPackets();
+	//for (auto it = mAddressToClientMap.begin(), end = mAddressToClientMap.end(); it != end; ++it)
+	//{
+	//	ClientProxyPtr clientProxy = it->second;
+	//	//process any timed out packets while we're going through the list
+	//	//clientProxy->GetDeliveryNotificationManager().ProcessTimedOutPackets();
 
-		if (clientProxy->IsLastMoveTimestampDirty())
-		{
-			SendStatePacketToClient(clientProxy);
-		}
-	}
+	//	if (clientProxy->IsLastMoveTimestampDirty())
+	//	{
+	//		SendStatePacketToClient(clientProxy);
+	//	}
+	//}
 }
 
 void NetworkManagerServer::UpdateAllClients()
 {
-	for (auto it = mAddressToClientMap.begin(), end = mAddressToClientMap.end(); it != end; ++it)
-	{
-		//process any timed out packets while we're going throug hthe list
-		//it->second->GetDeliveryNotificationManager().ProcessTimedOutPackets();
+	//for (auto it = mAddressToClientMap.begin(), end = mAddressToClientMap.end(); it != end; ++it)
+	//{
+	//	//process any timed out packets while we're going through the list
+	//	//it->second->GetDeliveryNotificationManager().ProcessTimedOutPackets();
 
-		SendStatePacketToClient(it->second);
-	}
+	//	SendStatePacketToClient(it->second);
+	//}
 }
 
 void NetworkManagerServer::SendStatePacketToClient(ClientProxyPtr inClientProxy)
@@ -213,7 +206,7 @@ bool NetworkManagerServer::CheckForDisconnects(SOCKETINFO& ptr, DWORD &retval, D
 			ptr.client->GetTCPSocket()->WSAGetOverlapptedResult(&ptr.overlapped);
 		}
 		HandleClientDisconnected(ptr.client);
-		delete &ptr;
+		delete &ptr; 
 		return true;
 	}
 
@@ -223,14 +216,13 @@ bool NetworkManagerServer::CheckForDisconnects(SOCKETINFO& ptr, DWORD &retval, D
 
 void NetworkManagerServer::HandleClientDisconnected(ClientProxyPtr inClientProxy)
 {
-	mPlayerIdToClientMap.erase(inClientProxy->GetPlayerId());
-	mAddressToClientMap.erase(inClientProxy->GetSocketAddress());
+	Client_Mgr->DeleteClient(inClientProxy);
 	static_cast<Server*> (Engine::sInstance.get())->HandleLostClient(inClientProxy);
 
 	//was that the last client? if so, bye!
-	if (mAddressToClientMap.empty())
+	if (Client_Mgr->Empty())
 	{
-		Engine::sInstance->SetShouldKeepRunning(false);
+	//	Engine::sInstance->SetShouldKeepRunning(false);
 	}
 
 	printf("[TCP 서버] 클라이언트 종료: %s \n",
@@ -247,10 +239,10 @@ void NetworkManagerServer::RegisterGameObject(GameObjectPtr inGameObject)
 	mNetworkIdToGameObjectMap[newNetworkId] = inGameObject;
 
 	//tell all client proxies this is new...
-	for (const auto& pair : mAddressToClientMap)
-	{
-		pair.second->GetReplicationManagerServer().ReplicateCreate(newNetworkId, inGameObject->GetAllStateMask());
-	}
+	//for (const auto& pair : mAddressToClientMap)
+	//{
+	//	pair.second->GetReplicationManagerServer().ReplicateCreate(newNetworkId, inGameObject->GetAllStateMask());
+	//}
 }
 
 
@@ -261,18 +253,18 @@ void NetworkManagerServer::UnregisterGameObject(GameObject* inGameObject)
 
 	//tell all client proxies to STOP replicating!
 	//tell all client proxies this is new...
-	for (const auto& pair : mAddressToClientMap)
-	{
-		pair.second->GetReplicationManagerServer().ReplicateDestroy(networkId);
-	}
+	//for (const auto& pair : mAddressToClientMap)
+	//{
+	//	pair.second->GetReplicationManagerServer().ReplicateDestroy(networkId);
+	//}
 }
 
 void NetworkManagerServer::SetStateDirty(int inNetworkId, uint32_t inDirtyState)
 {
 	//tell everybody this is dirty
-	for (const auto& pair : mAddressToClientMap)
-	{
-		pair.second->GetReplicationManagerServer().SetStateDirty(inNetworkId, inDirtyState);
-	}
+	//for (const auto& pair : mAddressToClientMap)
+	//{
+	//	pair.second->GetReplicationManagerServer().SetStateDirty(inNetworkId, inDirtyState);
+	//}
 }
 

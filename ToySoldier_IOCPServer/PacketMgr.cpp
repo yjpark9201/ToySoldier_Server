@@ -30,10 +30,10 @@ void PacketMgr::ProcessPacket(ClientProxyPtr inClientProxy, InputMemoryBitStream
 	inInputStream.Read(packetType);
 	switch (packetType)
 	{
-	case kHelloCC:
+	case kHelloCC: // 클라이언트가 팅겼다가 재접속한 경우
 		//need to resend welcome. to be extra safe we should check the name is the one we expect from this address,
 		//otherwise something weird is going on...
-		SendWelcomePacket(inClientProxy);
+		SendWelcomePacket(inClientProxy); 
 		printf("send WelcomePacekt");
 		break;
 	case kInputCC:

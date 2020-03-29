@@ -94,13 +94,13 @@ void Server::DoFrame()
 void Server::HandleNewClient(ClientProxyPtr inClientProxy)
 {
 
-	int playerId = inClientProxy->GetPlayerId();
+	int clientid = inClientProxy->GetPlayerId();
 
 	//ScoreBoardManager::sInstance->AddEntry(playerId, inClientProxy->GetName());
-	SpawnCatForPlayer(playerId);
+	SpawnUnitForPlayer(clientid);
 }
 
-void Server::SpawnCatForPlayer(int inPlayerId)
+void Server::SpawnUnitForPlayer(int inPlayerId)
 {
 	//RoboCatPtr cat = std::static_pointer_cast<RoboCat>(GameObjectRegistry::sInstance->CreateGameObject('RCAT'));
 	//cat->SetColor(ScoreBoardManager::sInstance->GetEntry(inPlayerId)->GetColor());
