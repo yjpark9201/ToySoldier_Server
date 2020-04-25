@@ -1,5 +1,35 @@
 #include "Toy_Shared.h"
 
+InputMemoryBitStream::InputMemoryBitStream(InputMemoryBitStream&& other) noexcept
+{
+	printf(" Move constructor 호출 - 메모리 주소 : %d  \n" ,this) ;
+	mBuffer = other.mBuffer; // 얕은 복사
+	mBitHead = other.mBitHead;
+	mBitCapacity = other.mBitCapacity;
+	mIsBufferOwner = other.mIsBufferOwner;
+
+	// 임시 객체 소멸 시에 메모리를 해제하지 못하게 한다.
+	other.mBuffer = nullptr; 
+}
+
+InputMemoryBitStream& InputMemoryBitStream::operator=(InputMemoryBitStream&& other) noexcept {
+	printf(" Move assignment operator 호출 - 메모리 주소 : %d  \n", this);
+	if (this != &other) {
+		delete[]mBuffer;
+
+
+		mBuffer = other.mBuffer; // 얕은 복사
+		mBitHead = other.mBitHead;
+		mBitCapacity = other.mBitCapacity;
+		mIsBufferOwner = other.mBitCapacity;
+
+		other.mBuffer = nullptr; // 이전 객체에서 pointer는 삭제
+
+	}
+	return *this;
+}
+
+
 void OutputMemoryBitStream::WriteBits(uint8_t inData,
 	uint32_t inBitCount)
 {
@@ -108,6 +138,7 @@ void test1()
 	mbs.WriteBits(11, 5);
 	mbs.WriteBits(52, 6);
 }
+
 
 void InputMemoryBitStream::ReadBits(uint8_t& outData, uint32_t inBitCount)
 {

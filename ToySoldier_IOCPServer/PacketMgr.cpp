@@ -30,7 +30,7 @@ void PacketMgr::ProcessPacket(ClientProxyPtr inClientProxy, InputMemoryBitStream
 	inInputStream.Read(packetType);
 	switch (packetType)
 	{
-	case kHelloCC: // 클라이언트가 팅겼다가 재접속한 경우
+	case kHelloCC: // 클라이언트가 팅겼다가 재접속한 경우 or UDP에서 같은 패킷을 두번 받은 경우
 		//need to resend welcome. to be extra safe we should check the name is the one we expect from this address,
 		//otherwise something weird is going on...
 		SendWelcomePacket(inClientProxy); 
@@ -52,7 +52,7 @@ void PacketMgr::ProcessPacket(ClientProxyPtr inClientProxy, InputMemoryBitStream
 }
 
 
-InputMemoryBitStream*  PacketMgr::RecvPacketFromBuffer(SOCKETINFO& ptr, int retval, DWORD &transferred, int &thread_id)
+InputMemoryBitStream  PacketMgr::RecvPacketFromBuffer(SOCKETINFO& ptr, int retval, DWORD &transferred, int &thread_id)
 {
 	 ptr.ringbuffer->update_head(transferred);
 	 short totalread = 0;
@@ -95,25 +95,12 @@ InputMemoryBitStream*  PacketMgr::RecvPacketFromBuffer(SOCKETINFO& ptr, int retv
 		 if (totalread != 0) {
 			
 			 InputMemoryBitStream inputStream(mRecvBuffer[thread_id], totalread * 8);
-		/*	 OutputMemoryBitStream ostream;
-			 short header = 0;
-			 uint32_t type;
-			 char a = 0;
-
-			 inputStream.Read(header);
-			 inputStream.Read(type);
-			 inputStream.Read(a);
-			 ostream.Write(header);
-			 ostream.Write(type);
-			 ostream.Write(a);
-			 SendPacketCP(ostream, ptr.client, nullptr);*/
-
-			// printf("[TCP 서버] 클라이언트 : %s에 %d byte를 보냈어요\n", ptr.client->GetSocketAddress().ToString().c_str(), header);
-			 ProcessPacket(ptr.client, inputStream);
-			 return &inputStream;
+		
+			 return inputStream;
 		 }
 		 else {
-			 return nullptr;
+			 InputMemoryBitStream inputStream(mRecvBuffer[thread_id], totalread * 8);
+			 return  inputStream;
 		 }
 }
 
@@ -121,9 +108,8 @@ bool PacketMgr::ProcessSentPacket(SOCKETINFO& ptr, int retval, DWORD &transferre
  {
 	 ptr.ringbuffer->update_head(transferred);
 	 size_t totalsent = 0;
-	 
-	 ptr.wsabuf.buf = ptr.wsabuf.buf + transferred;
-	 ptr.wsabuf.len = ptr.wsabuf.len - transferred;
+	 if (transferred == 0) return false;
+	
 	 while (true) {
 
 		 size_t remain = ptr.ringbuffer->remain();
@@ -142,44 +128,47 @@ bool PacketMgr::ProcessSentPacket(SOCKETINFO& ptr, int retval, DWORD &transferre
 			 printf("[TCP 서버] 클라이언트 : %s \n %d 바이트 패킷을 보냈습니다.\n",
 				 ptr.client->GetSocketAddress().ToString().c_str(), header);
 
+			 delete & ptr;
+
 			 continue;
 		
 
 
 
 		 }
-		 else break; 	 //헤더에 기록된 것만큼 데이터를 전송하지 못했다면 재전송
+		 else break; 	 
 
 	 }
 
+	 if (totalsent == 0) {//헤더에 기록된 것만큼 데이터를 전송하지 못했다면 재전송
 
-	// ptr.client->GetTCPSocket.IOCPSend(ptr);
+		 ptr.wsabuf.buf = ptr.ringbuffer->GetRecordablePoint();
+		 ptr.wsabuf.len = ptr.ringbuffer->GetRecordableSize();
+		 ptr.client->GetTCPSocket()->IOCPSend(ptr);
+	 }
  }
 
 
  void PacketMgr::SendPacketCP(const OutputMemoryBitStream& inOutputStream, const ClientProxyPtr& client, SOCKETINFO * ptr) {
 
 	 if (ptr == nullptr) {
-		 ptr = 	new SOCKETINFO(client);
+		 ptr = 	new SOCKETINFO(client, (CHAR*)inOutputStream.GetBufferPtr(), inOutputStream.GetByteLength());
 	 }
 
 	 ptr->client = client;
 	 ptr->SetIO_Operation(IO_OPERATION::Write);
-	 ptr->wsabuf.buf = (CHAR*)inOutputStream.GetBufferPtr();
-	 ptr->wsabuf.len = inOutputStream.GetByteLength();
 	 client->GetTCPSocket()->IOCPSend(*ptr);
  
  }
 
  void PacketMgr::SendWelcomePacket(ClientProxyPtr inClientProxy)
  {
-	 OutputMemoryBitStream welcomePacket;
+	 OutputMemoryBitStream welcomePacket; // 동적할당해줘야함 아마도
 	 short packetsize = 0;
-	 welcomePacket.Write(packetsize);
-	 welcomePacket.Write(kWelcomeCC);
-	 welcomePacket.Write(inClientProxy->GetPlayerId());
+	 welcomePacket.Write(packetsize); 
+	 welcomePacket.Write(kWelcomeCC); 
+	 welcomePacket.Write(inClientProxy->GetPlayerId()); 
 	 welcomePacket.UpdateStreamHeader();
-
 	 LOG("Server Welcoming, new client '%s' as player %d", inClientProxy->GetName().c_str(), inClientProxy->GetPlayerId());
 
 	 SendPacketCP(welcomePacket, inClientProxy, nullptr);

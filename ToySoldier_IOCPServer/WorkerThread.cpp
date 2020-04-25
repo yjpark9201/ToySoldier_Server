@@ -40,18 +40,9 @@ DWORD WINAPI WorkerThread(LPVOID arg) {
 
 		}
 		else {
-			NetworkManagerServer::sInstance->SentByteCount(cbTransferred);
-		//	NetworkManagerServer::sInstance->mPacektMgr(*ptr, cbTransferred);
+			NetworkManagerServer::sInstance->ProcessSentPacket(*ptr, retval, cbTransferred, ThreadInfo.id);
 		
 		}
-
-
-
-	
-	
-
-
-
 	}
 
 	return 0;

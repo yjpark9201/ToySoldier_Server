@@ -29,25 +29,36 @@ struct SOCKETINFO
 
 
 SOCKETINFO(ClientProxyPtr inclient ) {
-
-	ZeroMemory(&overlapped, sizeof(overlapped));
-	client = inclient;
 	ringbuffer = std::make_shared<Circular_buffer<char>>(BUFSIZE);
-	wsabuf.buf = ringbuffer->GetBegin();
-	//	memset(buf, 0, BUFSIZE);
-	wsabuf.len = BUFSIZE;
-	IOOperation = _IO_OPERATION::Read;
+	Init(inclient);
+	
 
-	//	printf("생성자 호출\n");
 }
 
+SOCKETINFO(ClientProxyPtr inclient, CHAR* buffer, size_t size) {
+	ringbuffer = std::make_shared<Circular_buffer<char>>(buffer, size);
+	Init(inclient);
+
+}
+
+
+
 		~SOCKETINFO() {
-			// printf("소멸자 호출\n");
+			 printf("소켓 정보 소멸자 호출 메모리 주소 : %d\n", this);
 		}
 
 		void SetIO_Operation(IO_OPERATION io) {
 			IOOperation = io;
 		}
+
+private: void Init(ClientProxyPtr inclient) {
+	ZeroMemory(&overlapped, sizeof(overlapped));
+	client = inclient;
+	wsabuf.buf = ringbuffer->GetRecordablePoint();
+	wsabuf.len = ringbuffer->GetRecordableSize();
+	IOOperation = _IO_OPERATION::Read;
+	
+}
 
 	
 };

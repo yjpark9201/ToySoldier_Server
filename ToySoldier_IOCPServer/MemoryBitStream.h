@@ -8,12 +8,12 @@ class LinkingContext;
 
 inline uint32_t ConvertToFixed(float inNumber, float inMin, float inPrecision)
 {
-	return static_cast< int > ((inNumber - inMin) / inPrecision);
+	return static_cast<int> ((inNumber - inMin) / inPrecision);
 }
 
 inline float ConvertFromFixed(uint32_t inNumber, float inMin, float inPrecision)
 {
-	return static_cast< float >(inNumber) * inPrecision + inMin;
+	return static_cast<float>(inNumber) * inPrecision + inMin;
 }
 
 
@@ -25,10 +25,12 @@ public:
 		mBitHead(0),
 		mBuffer(nullptr)
 	{
-		ReallocBuffer(1500 * 8);
+		ReallocBuffer(BUFSIZE * 8);
 	}
 
-	~OutputMemoryBitStream() { std::free(mBuffer); }
+	~OutputMemoryBitStream() { 
+		printf("메모리버퍼 소멸\n");
+	}//std::free(mBuffer); }
 
 	void		WriteBits(uint8_t inData, uint32_t inBitCount);
 	void		WriteBits(const void* inData, uint32_t inBitCount);
@@ -37,6 +39,7 @@ public:
 	uint32_t		GetBitLength()		const { return mBitHead; }
 	uint32_t		GetByteLength()		const { return (mBitHead + 7) >> 3; }
 	void			UpdateStreamHeader() { short len = (short)GetByteLength(); memmove(mBuffer, (void*)&len, 2); }
+	void FreeBuffer() { std::free(mBuffer); }
 
 
 	void WriteBytes(const void* inData, uint32_t inByteCount) { WriteBits(inData, inByteCount << 3); }
@@ -68,7 +71,7 @@ public:
 
 	void Write(const std::string& inString)
 	{
-		uint32_t elementCount = static_cast< uint32_t >(inString.size());
+		uint32_t elementCount = static_cast<uint32_t>(inString.size());
 		Write(elementCount);
 		for (const auto& element : inString)
 		{
@@ -92,21 +95,33 @@ public:
 		mBuffer(inBuffer),
 		mBitCapacity(inBitCount),
 		mBitHead(0),
-		mIsBufferOwner(false) {}
+		mIsBufferOwner(false) {
+	
+	}
 
 	InputMemoryBitStream(const InputMemoryBitStream& inOther) :
 		mBitCapacity(inOther.mBitCapacity),
 		mBitHead(inOther.mBitHead),
 		mIsBufferOwner(true)
 	{
+	
 		//allocate buffer of right size
 		int byteCount = mBitCapacity / 8;
-		mBuffer = static_cast< char* >(malloc(byteCount));
+		mBuffer = static_cast<char*>(malloc(byteCount));
 		//copy
 		memcpy(mBuffer, inOther.mBuffer, byteCount);
 	}
 
-	~InputMemoryBitStream() { if (mIsBufferOwner) { free(mBuffer); }; }
+
+
+	InputMemoryBitStream(InputMemoryBitStream&& other) noexcept;
+
+	InputMemoryBitStream& operator=(InputMemoryBitStream&& other) noexcept;
+
+
+	~InputMemoryBitStream() { 
+		printf(" InputMemoryBitStream 소멸자 호출 - 메모리 주소 : %d  \n", this);
+		if (mIsBufferOwner) { free(mBuffer); }; }
 
 	const 	char*	GetBufferPtr()		const { return mBuffer; }
 	uint32_t	GetRemainingBitCount() 	const { return mBitCapacity - mBitHead; }

@@ -54,7 +54,10 @@ void NetworkManagerServer::ProcessPacket(InputMemoryBitStream& inInputStream,
 void NetworkManagerServer::HandlePacketFromNewClient(SOCKETINFO& info, InputMemoryBitStream& inInputStream, const SocketAddress& inFromAddress)
 {
 	//read the beginning- is it a hello?
+	short size;
 	uint32_t	packetType;
+
+	inInputStream.Read(size);
 	inInputStream.Read(packetType);
 	if (packetType == PacketMgr::kHelloCC)
 	{

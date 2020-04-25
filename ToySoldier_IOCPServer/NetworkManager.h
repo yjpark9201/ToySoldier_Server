@@ -22,6 +22,7 @@ public:
 	bool	CreateListenThread();
 
 	virtual void	ProcessPacket(InputMemoryBitStream& inInputStream, SOCKETINFO& ptr, DWORD & cbTransferred, const SocketAddress& inFromAddress) = 0;
+	virtual void    ProcessSentPacket(SOCKETINFO& ptr, int retval, DWORD& transferred, int &thread_id);
 	virtual void	HandleConnectionReset(const SocketAddress& inFromAddress) { (void)inFromAddress; }
 
 	void	SentByteCount(int sentbyte);

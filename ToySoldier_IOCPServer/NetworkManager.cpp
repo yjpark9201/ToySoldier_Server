@@ -49,7 +49,7 @@ bool NetworkManager::Init(uint16_t inPort)
 	//if (!(CreateWorkerThread() && CreateListenThread())) return false;
 	CreateListenThread();
 
-	system("pause");
+	//system("pause");
 	CreateWorkerThread();
 
 	mBytesReceivedPerSecond = WeightedTimedMovingAverage(1.f);
@@ -76,18 +76,21 @@ void NetworkManager::ReadIncomingPackets(SOCKETINFO& ptr, DWORD &retval, DWORD &
 
 	int totalReadByteCount = 0;
 	
-
+	short size;
+	uint32_t	packetType;
 
 	totalReadByteCount += transferred;
 		//now, should we drop the packet?
 	if (ToyMath::GetRandomFloat() >= mDropPacketChance)
 	{
-			InputMemoryBitStream* streamptr =  mPacketMgr.RecvPacketFromBuffer(ptr, retval, transferred, thread_id);
+			InputMemoryBitStream  streamptr =  (mPacketMgr.RecvPacketFromBuffer(ptr, retval, transferred, thread_id));
+
 			//we made it
 			//shove the packet into the queue and we'll handle it as soon as we should...
 			//we'll pretend it wasn't received until simulated latency from now
 			//this doesn't sim jitter, for that we would need to.....
-
+			
+			ProcessPacket(streamptr, ptr, transferred, ptr.client->GetSocketAddress());
 	//	float simulatedReceivedTime = Timing::sInstance.GetTimef() + mSimulatedLatency;
 		//mPacketQueue.emplace(simulatedReceivedTime, inputStream, fromAddress);
 	}
@@ -134,6 +137,16 @@ void NetworkManager::SentByteCount(int sentbyte)
 		mBytesSentThisFrame += sentByteCount;
 	}
 }
+
+void NetworkManager::ProcessSentPacket(SOCKETINFO& ptr, int retval, DWORD& transferred, int &thread_id)
+{
+	SentByteCount(transferred);
+	mPacketMgr.ProcessSentPacket(ptr, retval, transferred, thread_id);
+	
+}
+
+
+
 
 void NetworkManager::UpdateBytesSentLastFrame()
 {

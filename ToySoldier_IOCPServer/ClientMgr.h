@@ -2,6 +2,8 @@
 class ClientMgr
 {
 private:
+
+	CRITICAL_SECTION mCS;
 	typedef unordered_map< int, ClientProxyPtr >	IntToClientMap;
 	typedef unordered_map< SocketAddress, ClientProxyPtr >	AddressToClientMap;
 
@@ -16,11 +18,11 @@ public:
 	void Reset();
 	//void ChangeStatusAll(Client_State state);
 	int GetClientNum() { return mAliveClientsNum; }
-	ClientProxyPtr GetClientProxy(int inPlayerId) const;
+	ClientProxyPtr GetClientProxy(int inPlayerId);
 	SOCKETINFO*  MakeClientSockInfo(TCPSocketPtr clientsock, SocketAddress & clientaddr);
 	void AddClient(string& name, SOCKETINFO& info, const SocketAddress& inFromAddress);
 	void DeleteClient(ClientProxyPtr inClientProxy);
 	bool Empty() { return mAddressToClientMap.empty(); }
-	ClientProxyPtr FindClientFromAddress(const SocketAddress& inFromAddress) { return mAddressToClientMap.find(inFromAddress)->second; }
+	ClientProxyPtr FindClientFromAddress(const SocketAddress& inFromAddress);
 	static ClientMgr* Instance();
 };

@@ -1,6 +1,6 @@
 #pragma once
 ;
-
+#include <iostream>
 template <class T>
 
 
@@ -9,6 +9,11 @@ public:
 	explicit Circular_buffer(size_t size) :
 		begin((new T[size])),
 		End(size) { }
+
+	explicit Circular_buffer(char* buffer, size_t size) :
+		begin(buffer),
+		End(size) {
+	}
 
 
 	~Circular_buffer();
@@ -48,6 +53,7 @@ private:
 
 template <class T>
 Circular_buffer<T>::~Circular_buffer() {
+	std::cout << "링버퍼 소멸 - 메모리 주소" << begin <<std::endl;
 	delete begin;
 }
 

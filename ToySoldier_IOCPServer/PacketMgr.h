@@ -19,7 +19,7 @@ public:
 
 	void SendPacketCP(const OutputMemoryBitStream& inOutputStream, const ClientProxyPtr& client, SOCKETINFO * ptr);
 
-	InputMemoryBitStream* RecvPacketFromBuffer(SOCKETINFO& ptr, int retval, DWORD &transferred, int &thread_id);
+	InputMemoryBitStream RecvPacketFromBuffer(SOCKETINFO& ptr, int retval, DWORD &transferred, int &thread_id);
 	bool ProcessSentPacket(SOCKETINFO& ptr, int retval, DWORD &transferred, int &thread_id);
 
 	 void	ProcessPacket(ClientProxyPtr inClientProxy, InputMemoryBitStream& inInputStream);
