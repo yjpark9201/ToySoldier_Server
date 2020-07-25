@@ -51,6 +51,8 @@ private:
 	bool			mIsLastMoveTimestampDirty;
 	TCPSocketPtr	mSock;
 
+	OutputMemoryBitStream OutGoingPacket;
+
 
 };
 

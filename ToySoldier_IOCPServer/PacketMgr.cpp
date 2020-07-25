@@ -30,15 +30,16 @@ void PacketMgr::ProcessPacket(ClientProxyPtr inClientProxy, InputMemoryBitStream
 	inInputStream.Read(packetType);
 	switch (packetType)
 	{
-	case kHelloCC: // 클라이언트가 팅겼다가 재접속한 경우 or UDP에서 같은 패킷을 두번 받은 경우
+	case PacketType::Hello: // 클라이언트가 팅겼다가 재접속한 경우 or UDP에서 같은 패킷을 두번 받은 경우
 		//need to resend welcome. to be extra safe we should check the name is the one we expect from this address,
 		//otherwise something weird is going on...
 		SendWelcomePacket(inClientProxy); 
 		printf("send WelcomePacekt");
 		break;
-	case kInputCC:
+	case  PacketType::Input:
 		//if (inClientProxy->GetDeliveryNotificationManager().ReadAndProcessState(inInputStream))
 		//{
+		printf("이동패킷 수신\n");
 		HandleInputPacket(inClientProxy, inInputStream);
 		//	}
 		break;
@@ -99,7 +100,7 @@ InputMemoryBitStream  PacketMgr::RecvPacketFromBuffer(SOCKETINFO& ptr, int retva
 			 return inputStream;
 		 }
 		 else {
-			 InputMemoryBitStream inputStream(mRecvBuffer[thread_id], totalread * 8);
+			 InputMemoryBitStream inputStream(nullptr, 0);
 			 return  inputStream;
 		 }
 }
@@ -164,9 +165,9 @@ bool PacketMgr::ProcessSentPacket(SOCKETINFO& ptr, int retval, DWORD &transferre
  void PacketMgr::SendWelcomePacket(ClientProxyPtr inClientProxy)
  {
 	 OutputMemoryBitStream welcomePacket; // 동적할당해줘야함 아마도
-	 short packetsize = 0;
-	 welcomePacket.Write(packetsize); 
-	 welcomePacket.Write(kWelcomeCC); 
+	 short header = 0;
+	 welcomePacket.Write(header);
+	 welcomePacket.Write(PacketType::Welcome); 
 	 welcomePacket.Write(inClientProxy->GetPlayerId()); 
 	 welcomePacket.UpdateStreamHeader();
 	 LOG("Server Welcoming, new client '%s' as player %d", inClientProxy->GetName().c_str(), inClientProxy->GetPlayerId());
@@ -176,12 +177,12 @@ bool PacketMgr::ProcessSentPacket(SOCKETINFO& ptr, int retval, DWORD &transferre
 
  void PacketMgr::HandleInputPacket(ClientProxyPtr inClientProxy, InputMemoryBitStream& inInputStream)
  {
-	 uint32_t moveCount = 0;
+//	 uint32_t moveCount = 0;
 	 Move move;
-	 inInputStream.Read(moveCount, 2);
+//	 inInputStream.Read(moveCount, 2);
 
-	 for (; moveCount > 0; --moveCount)
-	 {
+	 //for (; moveCount > 0; --moveCount)
+	 //{
 		 if (move.Read(inInputStream))
 		 {
 			 if (inClientProxy->GetUnprocessedMoveList().AddMoveIfNew(move))
@@ -189,5 +190,5 @@ bool PacketMgr::ProcessSentPacket(SOCKETINFO& ptr, int retval, DWORD &transferre
 				 inClientProxy->SetIsLastMoveTimestampDirty(true);
 			 }
 		 }
-	 }
+//	 }
  }

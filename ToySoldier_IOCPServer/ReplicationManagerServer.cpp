@@ -27,7 +27,7 @@ void ReplicationManagerServer::HandleCreateAckd(int inNetworkId)
 	mNetworkIdToReplicationCommand[inNetworkId].HandleCreateAckd();
 }
 
-void ReplicationManagerServer::Write(OutputMemoryBitStream& inOutputStream, ReplicationManagerTransmissionData* ioTransmissinData)
+void ReplicationManagerServer::Write(OutputMemoryBitStream& inOutputStream)
 {
 	//run through each replication command and do something...
 	for (auto& pair : mNetworkIdToReplicationCommand)
@@ -62,7 +62,7 @@ void ReplicationManagerServer::Write(OutputMemoryBitStream& inOutputStream, Repl
 				break;
 			}
 
-			ioTransmissinData->AddTransmission(networkId, action, writtenState);
+			//ioTransmissinData->AddTransmission(networkId, action, writtenState);
 
 			//let's pretend everything was written- don't make this too hard
 			replicationCommand.ClearDirtyState(writtenState);

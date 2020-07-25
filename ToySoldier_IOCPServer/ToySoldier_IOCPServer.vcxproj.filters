@@ -135,14 +135,20 @@
     <ClCompile Include="WorkerThread.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="circular_buffer.cpp">
-      <Filter>소스 파일\Util</Filter>
-    </ClCompile>
     <ClCompile Include="ClientProxy.cpp">
       <Filter>소스 파일\Network\ClientMgr</Filter>
     </ClCompile>
     <ClCompile Include="ClientMgr.cpp">
       <Filter>소스 파일\Network\ClientMgr</Filter>
+    </ClCompile>
+    <ClCompile Include="circular_buffer.cpp">
+      <Filter>소스 파일\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="ToySoldier.cpp">
+      <Filter>소스 파일\GameRogicFrame\GameObject</Filter>
+    </ClCompile>
+    <ClCompile Include="ToySoldierPCH.cpp">
+      <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -253,6 +259,12 @@
     </ClInclude>
     <ClInclude Include="ClientMgr.h">
       <Filter>헤더 파일\ClientMgr</Filter>
+    </ClInclude>
+    <ClInclude Include="ToySoldier.h">
+      <Filter>헤더 파일\GameObject</Filter>
+    </ClInclude>
+    <ClInclude Include="ToySoldierPCH.h">
+      <Filter>헤더 파일</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

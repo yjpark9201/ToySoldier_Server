@@ -68,11 +68,12 @@ SOCKETINFO* ClientMgr::MakeClientSockInfo(TCPSocketPtr clientsock, SocketAddress
 //}
 
 
+
+
+
 ClientProxyPtr ClientMgr::GetClientProxy(int inPlayerId)
 {
-	EnterCriticalSection(&mCS);
 	auto it = mPlayerIdToClientMap.find(inPlayerId);
-	LeaveCriticalSection(&mCS);
 	if (it != mPlayerIdToClientMap.end())
 	{
 		return it->second;
@@ -82,9 +83,7 @@ ClientProxyPtr ClientMgr::GetClientProxy(int inPlayerId)
 }
 
 ClientProxyPtr ClientMgr::FindClientFromAddress(const SocketAddress& inFromAddress) {
-	EnterCriticalSection(&mCS);
 	auto it = mAddressToClientMap.find(inFromAddress);
-	LeaveCriticalSection(&mCS);
 	if (it != mAddressToClientMap.end())
 	{
 		return it->second;

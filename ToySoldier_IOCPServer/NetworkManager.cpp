@@ -84,13 +84,14 @@ void NetworkManager::ReadIncomingPackets(SOCKETINFO& ptr, DWORD &retval, DWORD &
 	if (ToyMath::GetRandomFloat() >= mDropPacketChance)
 	{
 			InputMemoryBitStream  streamptr =  (mPacketMgr.RecvPacketFromBuffer(ptr, retval, transferred, thread_id));
-
+			if(streamptr.GetBufferPtr() != nullptr)
+				ProcessPacket(streamptr, ptr, transferred, ptr.client->GetSocketAddress());
 			//we made it
 			//shove the packet into the queue and we'll handle it as soon as we should...
 			//we'll pretend it wasn't received until simulated latency from now
 			//this doesn't sim jitter, for that we would need to.....
 			
-			ProcessPacket(streamptr, ptr, transferred, ptr.client->GetSocketAddress());
+		
 	//	float simulatedReceivedTime = Timing::sInstance.GetTimef() + mSimulatedLatency;
 		//mPacketQueue.emplace(simulatedReceivedTime, inputStream, fromAddress);
 	}

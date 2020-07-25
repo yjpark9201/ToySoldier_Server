@@ -52,7 +52,7 @@ using std::unordered_map;
 using std::string;
 using std::unordered_set;
 
-class RoboCat;
+class ToySoldier;
 class GameObject;
 #include"define.h"
 #include "Toymath.h"
@@ -84,7 +84,7 @@ class GameObject;
 //
 #include "GameObject.h"
 #include "GameObjectRegistry.h"
-//#include "RoboCat.h"
+
 #include "World.h"
 #include "Timing.h"
 //#include "Mouse.h"
@@ -109,6 +109,7 @@ class GameObject;
 #include "ClientProxy.h"
 #include "ClientMgr.h"
 #include "NetworkManagerServer.h"
+#include "ToySoldier.h"
 #include "Server.h"
 
 

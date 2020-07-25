@@ -18,10 +18,12 @@ public:
 	void Reset();
 	//void ChangeStatusAll(Client_State state);
 	int GetClientNum() { return mAliveClientsNum; }
+	AddressToClientMap GetAllClientMap() { return mAddressToClientMap; }
 	ClientProxyPtr GetClientProxy(int inPlayerId);
 	SOCKETINFO*  MakeClientSockInfo(TCPSocketPtr clientsock, SocketAddress & clientaddr);
 	void AddClient(string& name, SOCKETINFO& info, const SocketAddress& inFromAddress);
 	void DeleteClient(ClientProxyPtr inClientProxy);
+
 	bool Empty() { return mAddressToClientMap.empty(); }
 	ClientProxyPtr FindClientFromAddress(const SocketAddress& inFromAddress);
 	static ClientMgr* Instance();

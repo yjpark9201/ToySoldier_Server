@@ -1,6 +1,14 @@
 #pragma once
 
 #define Packet_Size 1500
+
+enum PacketType {
+	Hello,
+	Welcome,
+	State,
+	Input
+};
+
 class PacketMgr
 {
 public:

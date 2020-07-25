@@ -12,7 +12,7 @@ public:
 	void HandleCreateAckd(int inNetworkId);
 	void RemoveFromReplication(int inNetworkId);
 
-	void Write(OutputMemoryBitStream& inOutputStream, ReplicationManagerTransmissionData* ioTransmissinData);
+	void Write(OutputMemoryBitStream& inOutputStream);
 
 private:
 

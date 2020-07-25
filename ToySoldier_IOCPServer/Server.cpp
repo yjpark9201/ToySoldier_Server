@@ -15,9 +15,9 @@ bool Server::StaticInit()
 Server::Server()
 {
 	printf("서버 초기화\n");
-//	GameObjectRegistry::sInstance->RegisterCreationFunction('RCAT', RoboCatServer::StaticCreate);
-//	GameObjectRegistry::sInstance->RegisterCreationFunction('MOUS', MouseServer::StaticCreate);
-//	GameObjectRegistry::sInstance->RegisterCreationFunction('YARN', YarnServer::StaticCreate);
+	GameObjectRegistry::sInstance->RegisterCreationFunction('TSOL', ToySoldier::StaticCreate);
+	//GameObjectRegistry::sInstance->RegisterCreationFunction('MOUS', MouseServer::StaticCreate);
+	//GameObjectRegistry::sInstance->RegisterCreationFunction('YARN', YarnServer::StaticCreate);
 
 	InitNetworkManager();
 
@@ -102,11 +102,13 @@ void Server::HandleNewClient(ClientProxyPtr inClientProxy)
 
 void Server::SpawnUnitForPlayer(int inPlayerId)
 {
-	//RoboCatPtr cat = std::static_pointer_cast<RoboCat>(GameObjectRegistry::sInstance->CreateGameObject('RCAT'));
-	//cat->SetColor(ScoreBoardManager::sInstance->GetEntry(inPlayerId)->GetColor());
-	//cat->SetPlayerId(inPlayerId);
-	////gotta pick a better spawn location than this...
-	//cat->SetLocation(Vector3(1.f - static_cast<float>(inPlayerId), 0.f, 0.f));
+	ToySoldierPtr sol = std::static_pointer_cast<ToySoldier>(GameObjectRegistry::sInstance->CreateGameObject('TSOL'));
+	//sol->SetColor(ScoreBoardManager::sInstance->GetEntry(inPlayerId)->GetColor());
+	sol->SetPlayerId(inPlayerId);
+	//gotta pick a better spawn location than this...
+	sol->SetLocation(Vector3(1.f - static_cast<float>(inPlayerId), 0.f, 0.f));
+
+	printf("플레이어 %d의 장난감병사 생성 \n", inPlayerId);
 
 }
 

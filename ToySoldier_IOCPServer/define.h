@@ -6,6 +6,8 @@
 #define HEADERMAX 1000 // 헤더 최대 유효값
 #define CPU_NUM 8
 #define TEMPCLIENTID -100//임시 클라이언트 아이디
+#define SERVERPORT 8052
+
 
 class ClientProxy;
 class TCPSocket;

@@ -190,6 +190,8 @@
     <ClCompile Include="TCPSocket.cpp" />
     <ClCompile Include="Timing.cpp" />
     <ClCompile Include="Toymath.cpp" />
+    <ClCompile Include="ToySoldier.cpp" />
+    <ClCompile Include="ToySoldierPCH.cpp" />
     <ClCompile Include="ToySoldier_IOCPServer.cpp" />
     <ClCompile Include="UDPSocket.cpp" />
     <ClCompile Include="WorkerThread.cpp" />
@@ -227,6 +229,8 @@
     <ClInclude Include="TCPSocket.h" />
     <ClInclude Include="Timing.h" />
     <ClInclude Include="Toymath.h" />
+    <ClInclude Include="ToySoldier.h" />
+    <ClInclude Include="ToySoldierPCH.h" />
     <ClInclude Include="Toy_Shared.h" />
     <ClInclude Include="TransmissionData.h" />
     <ClInclude Include="UDPSocket.h" />

@@ -59,12 +59,12 @@ void NetworkManagerServer::HandlePacketFromNewClient(SOCKETINFO& info, InputMemo
 
 	inInputStream.Read(size);
 	inInputStream.Read(packetType);
-	if (packetType == PacketMgr::kHelloCC)
+	if (packetType == PacketType::Hello)
 	{
 		//read the name
 		string name;
 		inInputStream.Read(name);
-
+		
 		Client_Mgr->AddClient(name, info, inFromAddress);
 
 		//tell the server about this client, spawn a cat, etc...
@@ -103,18 +103,20 @@ void NetworkManagerServer::SendOutgoingPackets()
 {
 	float time = Timing::sInstance.GetTimef();
 
+	auto clientmap = Client_Mgr->GetAllClientMap();
 	//let's send a client a state packet whenever their move has come in...
-	//for (auto it = mAddressToClientMap.begin(), end = mAddressToClientMap.end(); it != end; ++it)
-	//{
-	//	ClientProxyPtr clientProxy = it->second;
-	//	//process any timed out packets while we're going through the list
-	//	//clientProxy->GetDeliveryNotificationManager().ProcessTimedOutPackets();
+	for (auto it = clientmap.begin(), end = clientmap.end(); it != end; ++it)
+	{
+		ClientProxyPtr clientProxy = it->second;
+		//process any timed out packets while we're going through the list
+		//clientProxy->GetDeliveryNotificationManager().ProcessTimedOutPackets();
+		if (clientProxy->IsLastMoveTimestampDirty())
+		{
+			SendStatePacketToClient(clientProxy);
+		}
+	}
 
-	//	if (clientProxy->IsLastMoveTimestampDirty())
-	//	{
-	//		SendStatePacketToClient(clientProxy);
-	//	}
-	//}
+//
 }
 
 void NetworkManagerServer::UpdateAllClients()
@@ -134,7 +136,7 @@ void NetworkManagerServer::SendStatePacketToClient(ClientProxyPtr inClientProxy)
 	OutputMemoryBitStream	statePacket;
 
 	//it's state!
-	statePacket.Write(PacketMgr::kStateCC);
+	statePacket.Write(PacketType::State);
 
 	//InFlightPacket* ifp = inClientProxy->GetDeliveryNotificationManager().WriteState(statePacket);
 
@@ -142,8 +144,8 @@ void NetworkManagerServer::SendStatePacketToClient(ClientProxyPtr inClientProxy)
 
 	AddScoreBoardStateToPacket(statePacket);
 
-	ReplicationManagerTransmissionData* rmtd = new ReplicationManagerTransmissionData(&inClientProxy->GetReplicationManagerServer());
-	inClientProxy->GetReplicationManagerServer().Write(statePacket, rmtd);
+	//ReplicationManagerTransmissionData* rmtd = new ReplicationManagerTransmissionData(&inClientProxy->GetReplicationManagerServer());
+	inClientProxy->GetReplicationManagerServer().Write(statePacket);
 	//ifp->SetTransmissionData('RPLM', TransmissionDataPtr(rmtd));
 
 	mPacketMgr.SendPacketCP(statePacket, inClientProxy,nullptr);
