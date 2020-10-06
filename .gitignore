@@ -26,3 +26,4 @@ ToySoldier_IOCPServer/x64/Debug/clientmgr.obj.enc
 .vs/ToySoldier_IOCPServer/v15/ipch/AutoPCH/caf7d92e7f98f5e1/CIRCULAR_BUFFER.ipch
 .vs/ToySoldier_IOCPServer/v15/ipch/AutoPCH/ca368f1e585f56b4/COMPLETIONPORTTCPSERVER.ipch
 .vs/ToySoldier_IOCPServer/v15/Browse.VC.db
+*.ipch
